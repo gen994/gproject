@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Ti Amo Piccola</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: radial-gradient(ellipse at center, #0b0c1a 0%, #000000 100%);
+      font-family: 'Arial', sans-serif;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+      flex-direction: column;
+      text-align: center;
+    }
+    .intro {
+      animation: fadeIn 2s ease forwards;
+    }
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translateY(-20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .button {
+      margin-top: 30px;
+      padding: 12px 20px;
+      background: #fff;
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .button:hover {
+      background: #eee;
+    }
+    #container {
+      display: none;
+      position: relative;
+      width: 320px;
+      height: 180px;
+      background: #111;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 0 15px #888;
+      margin-top: 30px;
+    }
+    #message {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/FullMoon2010.jpg/640px-FullMoon2010.jpg') center/cover no-repeat;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 24px;
+      font-weight: bold;
+      z-index: 1;
+      color: white;
+      text-shadow: 2px 2px 5px #000;
+    }
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 2;
+    }
+    .heart {
+      position: fixed;
+      top: -20px;
+      font-size: 20px;
+      color: pink;
+      animation: fall 4s linear forwards;
+      z-index: 9999;
+    }
+    @keyframes fall {
+      100% {
+        transform: translateY(100vh);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <audio autoplay loop>
+    <source src="https://www.bensound.com/bensound-music/bensound-love.mp3" type="audio/mpeg">
+  </audio>
+
+  <div class="intro">
+    <h1>Per la mia Piccola Luna...</h1>
+    <p>In un mondo che non ci dà sempre spazio, ho trovato il mio universo nei tuoi occhi.</p>
+    <p>Ti ho preparato qualcosa di speciale.</p>
+    <button class="button" onclick="startGratta()">Scopri cosa</button>
+  </div>
+
+  <div id="container">
+    <div id="message">Ti amo Piccola!</div>
+    <canvas width="320" height="180"></canvas>
+  </div>
+
+  <script>
+    function startGratta() {
+      document.querySelector('.intro').style.display = 'none';
+      document.getElementById('container').style.display = 'block';
+    }
+
+    const canvas = document.querySelector('canvas');
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#c0c0c0';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    let drawing = false;
+    let clearedPixels = 0;
+
+    function startDrawing(e) {
+      drawing = true;
+      draw(e);
+    }
+
+    function stopDrawing() {
+      drawing = false;
+      ctx.beginPath();
+    }
+
+    function draw(e) {
+      if (!drawing) return;
+
+      e.preventDefault();
+      let x, y;
+      if (e.touches) {
+        const rect = canvas.getBoundingClientRect();
+        x = e.touches[0].clientX - rect.left;
+        y = e.touches[0].clientY - rect.top;
+      } else {
+        x = e.offsetX;
+        y = e.offsetY;
+      }
+
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.beginPath();
+      ctx.arc(x, y, 20, 0, Math.PI * 2);
+      ctx.fill();
+
+      clearedPixels += 1;
+      if (clearedPixels > 100) {
+        launchHearts();
+        clearedPixels = -9999;
+      }
+    }
+
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('touchstart', startDrawing);
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('touchend', stopDrawing);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('touchmove', draw);
+
+    function launchHearts() {
+      for (let i = 0; i < 30; i++) {
+        const heart = document.createElement('div');
+        heart.className = 'heart';
+        heart.textContent = '♥';
+        heart.style.left = Math.random() * 100 + 'vw';
+        heart.style.fontSize = (Math.random() * 20 + 10) + 'px';
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), 4000);
+      }
+    }
+  </script>
+</body>
+</html>
